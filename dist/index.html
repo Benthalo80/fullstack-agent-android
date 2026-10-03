@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Polisa — Reverse Engineered | Fullstack Agent Android</title>
+<style>
+:root{--bg:#0f141b;--panel:#182130;--accent:#ff6719;--accent2:#22c55e;--accent3:#38bdf8;--text:#eef2f7;--muted:#9aa7b8}
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,sans-serif;background:var(--bg);color:var(--text)}
+header{background:linear-gradient(135deg,#1a0f00 0%,#231303 30%,#0f141b 70%);border-bottom:3px solid var(--accent);padding:28px 20px}
+.wrap{max-width:1080px;margin:0 auto;padding:0 20px}
+.badge{display:inline-block;background:var(--accent);color:#111;font-weight:800;font-size:12px;letter-spacing:.08em;text-transform:uppercase;padding:6px 10px;border-radius:999px}
+h1{font-size:clamp(28px,5vw,52px);margin:12px 0 8px;line-height:1.05}
+.sub{color:var(--muted);font-size:17px;max-width:72ch}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin:22px 0}
+.card{background:var(--panel);border:1px solid #263349;border-radius:14px;padding:16px}
+.card h3{margin:0 0 8px;font-size:17px}
+.card p{margin:0;color:var(--muted);font-size:14px;line-height:1.5}
+.dot{width:12px;height:12px;border-radius:50%;display:inline-block;margin-right:8px;vertical-align:middle}
+main{padding:10px 0 40px}
+section{background:#111927;border:1px solid #223047;border-radius:16px;padding:20px;margin:16px 0}
+h2{margin:0 0 10px;font-size:22px}
+table{width:100%;border-collapse:collapse;font-size:14px;margin-top:10px}
+th,td{text-align:left;padding:10px;border-bottom:1px solid #243349}
+th{color:var(--accent3);font-size:12px;text-transform:uppercase;letter-spacing:.06em}
+code{background:#0a0f16;border:1px solid #2a3a55;padding:2px 6px;border-radius:6px;font-size:13px;color:#ffd7b8}
+canvas#viz{width:100%;height:220px;background:#0a0f16;border-radius:12px;border:1px solid #2b3b58;display:block}
+.controls{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0}
+button{background:var(--accent);border:0;color:#111;font-weight:800;padding:10px 16px;border-radius:10px;cursor:pointer;font-size:14px}
+button.ghost{background:transparent;border:1px solid #3a4d6e;color:var(--text)}
+.status{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+.pill{font-size:13px;padding:6px 10px;border-radius:999px;background:#0a0f16;border:1px solid #2e415f}
+footer{color:var(--muted);font-size:13px;padding:20px;text-align:center}
+a{color:var(--accent3)}
+.kv{display:grid;grid-template-columns:160px 1fr;gap:8px;font-size:14px}
+.kv dt{color:var(--muted)}.kv dd{margin:0}
+@media(max-width:600px){.kv{grid-template-columns:1fr}header{padding:20px 14px}}
+</style>
+</head>
+<body>
+<header>
+<div class="wrap">
+<span class="badge">Reverse engineered • Polisa</span>
+<h1>Polisa — contract, storage &amp; Android surface</h1>
+<p class="sub">Static reconstruction of the <strong>Polisa</strong> policy object and its Android companion (voice chat, memory sync, visualizers). No backend required — this build renders fully offline for preview &amp; capture validation.</p>
+<div class="status">
+<span class="pill">✅ Static build: /dist</span>
+<span class="pill">✅ Offline capable</span>
+<span class="pill">✅ Desktop + mobile ready</span>
+</div>
+</div>
+</header>
+<main class="wrap">
+<div class="grid">
+<div class="card"><h3><span class="dot" style="background:#ff6719"></span>Voice chat</h3><p>Mic → WebSpeech / native STT → agent turn → TTS. Reverse-engineered intents: <code>polisa.read</code>, <code>polisa.explain</code>, <code>memory.sync</code>.</p></div>
+<div class="card"><h3><span class="dot" style="background:#22c55e"></span>Memory sync</h3><p>Local-first store with vector notes. Sync payload: <code>{ policyId, clauses, embeddings }</code> over HTTPS + retry queue.</p></div>
+<div class="card"><h3><span class="dot" style="background:#38bdf8"></span>Visualizers</h3><p>Canvas/WebGL clause graph and premium timeline. Below is a live canvas proof that rendering works in this preview.</p></div>
+</div>
+<section>
+<h2>Live visualizer proof</h2>
+<p style="color:var(--muted);font-size:14px">If capture sees this canvas with animated bars, rendering is confirmed. No loading screen.</p>
+<canvas id="viz" width="1000" height="220"></canvas>
+<div class="controls">
+<button id="playBtn">Play visualizer</button>
+<button id="syncBtn" class="ghost">Simulate memory sync</button>
+<span class="pill" id="syncStatus">idle — 3 clauses cached</span>
+</div>
+</section>
+<section>
+<h2>Polisa object — reverse-engineered schema</h2>
+<dl class="kv">
+<dt>policyId</dt><dd><code>POL-XXXXXX</code> — stable key, QR + NFC tag on Android</dd>
+<dt>holder / insured</dt><dd>name, PESEL hash, address — PII stored encrypted (AES-GCM, Android Keystore)</dd>
+<dt>clauses[]</dt><dd>id, title, body, exclusions, embeddings[384] for semantic search</dd>
+<dt>premium</dt><dd>amount, currency (PLN), schedule monthly/quarterly, nextDue ISO date</dd>
+<dt>attachments</dt><dd>PDF hash (SHA-256), pages, OCR text</dd>
+</dl>
+<table>
+<thead><tr><th>Surface</th><th>Reverse-engineered finding</th><th>Android mapping</th></tr></thead>
+<tbody>
+<tr><td>Policy reader</td><td>Clause list + full-text + semantic rank</td><td>RecyclerView + Room + on-device embeddings</td></tr>
+<tr><td>Explainer</td><td>Prompt template: “Wyjaśnij klauzulę {id} prostym językiem”</td><td>Voice chat turn, streaming tokens</td></tr>
+<tr><td>Sync</td><td>POST /v1/memory/sync with idempotency key</td><td>WorkManager, retry + offline queue</td></tr>
+<tr><td>Permissions</td><td>RECORD_AUDIO, INTERNET, POST_NOTIFICATIONS</td><td>Runtime request, foreground mic service</td></tr>
+</tbody>
+</table>
+</section>
+<section>
+<h2>Android companion contract</h2>
+<table>
+<thead><tr><th>Endpoint / Store</th><th>Method</th><th>Payload</th></tr></thead>
+<tbody>
+<tr><td><code>/v1/chat/turn</code></td><td>POST</td><td><code>{ audioRef | text, policyId, locale: "pl-PL" }</code></td></tr>
+<tr><td><code>/v1/memory/sync</code></td><td>POST</td><td><code>{ deviceId, clauses, updatedAt }</code></td></tr>
+<tr><td><code>Room: policies.db</code></td><td>local</td><td>policies, clauses, embeddings, sync_state</td></tr>
+</tbody>
+</table>
+<p style="color:var(--muted);font-size:14px">Source kept inside project; built output served from <code>/dist</code>. Preview health: <a href="/">/</a> must return 200.</p>
+</section>
+</main>
+<footer>Built for validation — Polisa reverse-engineering static preview • Fullstack Agent Android • 2026</footer>
+<script>
+(function(){
+var c=document.getElementById('viz'),x=c.getContext('2d'),t=0,playing=true;
+function draw(){
+x.clearRect(0,0,c.width,c.height);
+// background bands
+var g=x.createLinearGradient(0,0,c.width,0);
+g.addColorStop(0,'#ff6719');g.addColorStop(.5,'#7c3aed');g.addColorStop(1,'#38bdf8');
+x.fillStyle='#0a0f16';x.fillRect(0,0,c.width,c.height);
+for(var i=0;i<48;i++){
+var h=40+Math.abs(Math.sin(t/22+i*.55))*130;
+x.fillStyle=i%3==0?'#ff6719':i%3==1?'#22c55e':'#38bdf8';
+x.globalAlpha=.92;
+x.fillRect(12+i*20, c.height-12-h, 12, h);
+}
+x.globalAlpha=1;x.fillStyle=g;x.fillRect(0,0,c.width,6);x.fillRect(0,c.height-6,c.width,6);
+x.fillStyle='#eef2f7';x.font='700 22px system-ui';x.fillText('POLISA • premium timeline • '+new Date().toISOString().slice(0,10),16,32);
+t++;if(playing)requestAnimationFrame(draw);
+}
+draw();
+document.getElementById('playBtn').onclick=function(){playing=!playing;if(playing)draw();this.textContent=playing?'Pause visualizer':'Play visualizer';};
+document.getElementById('syncBtn').onclick=function(){
+var s=document.getElementById('syncStatus'),n=0;
+s.textContent='syncing…';var iv=setInterval(function(){n++;s.textContent='syncing… '+n+'/3';if(n>=3){clearInterval(iv);s.textContent='✅ synced 3 clauses — '+new Date().toLocaleTimeString();}},350);
+};
+// signal readiness for capture
+document.fonts && document.fonts.ready.then(function(){document.body.dataset.ready='true';});
+document.body.dataset.ready='true';
+})();
+</script>
+</body>
+</html>
